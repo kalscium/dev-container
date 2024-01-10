@@ -24,6 +24,8 @@ RUN apt install helix
 
 # Install rust
 RUN su greenchild -c "curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain $RUST_TOOLCHAIN --target $RUST_TARGET_WIN --component rust-src rustfmt clippy cargo rustc rust-std rust-docs rust-analyzer"
+# Install bacon
+RUN su greenchild -c "/home/greenchild/.cargo/bin/cargo install bacon"
 
 # Setup home dir
 RUN mkdir /home/greenchild/project
