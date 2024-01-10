@@ -24,14 +24,20 @@ RUN apt install helix
 
 # Install rust
 RUN su greenchild -c "curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain $RUST_TOOLCHAIN --target $RUST_TARGET_WIN --component rust-src rustfmt clippy cargo rustc rust-std rust-docs rust-analyzer"
+
 # Install bacon
 RUN su greenchild -c "/home/greenchild/.cargo/bin/cargo install bacon"
+# Install pros-cli (for vexv5 dev)
+RUN su greenchild -c "pip install pros-cli"
 
 # Setup home dir
 RUN mkdir /home/greenchild/project
-COPY zshrc /home/greenchild/.zshrc
-COPY helix /home/greenchild/.config/helix
-COPY tmux.conf /home/greenchild/.tmux.conf
+COPY include/zshrc /home/greenchild/.zshrc
+COPY include/helix /home/greenchild/.config/helix
+COPY include/tmux.conf /home/greenchild/.tmux.conf
 WORKDIR /home/greenchild/project
+
+# Set correct permissions
+RUN chmod -R a+rw /home/greenchild/.config
 
 CMD su greenchild -c "SHELL='/usr/bin/zsh' tmux new-session -ds dev && tmux attach-session -t dev"
