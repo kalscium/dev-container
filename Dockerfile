@@ -6,9 +6,9 @@ ENV RUST_TARGET_WIN="x86_64-pc-windows-gnu"
 ENV SHELL="/usr/bin/zsh"
 
 # Create my user
-RUN useradd -m greenchild
-RUN usermod -aG sudo greenchild
-RUN echo 'greenchild ALL=(ALL) NOPASSWORD:ALL' >> /etc/sudoers
+RUN useradd -m dev
+RUN usermod -aG sudo dev
+RUN echo 'dev ALL=(ALL) NOPASSWORD:ALL' >> /etc/sudoers
 
 # Get the required packages from apt
 RUN apt-get update -y
@@ -23,21 +23,21 @@ RUN apt-get update -y
 RUN apt install helix
 
 # Install rust
-RUN su greenchild -c "curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain $RUST_TOOLCHAIN --target $RUST_TARGET_WIN --component rust-src rustfmt clippy cargo rustc rust-std rust-docs rust-analyzer"
+RUN su dev -c "curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain $RUST_TOOLCHAIN --target $RUST_TARGET_WIN --component rust-src rustfmt clippy cargo rustc rust-std rust-docs rust-analyzer"
 
 # Install bacon
-RUN su greenchild -c "/home/greenchild/.cargo/bin/cargo install bacon"
+RUN su dev -c "/home/dev/.cargo/bin/cargo install bacon"
 # Install pros-cli (for vexv5 dev)
-RUN su greenchild -c "pip install pros-cli"
+RUN su dev -c "pip install pros-cli"
 
 # Setup home dir
-RUN mkdir /home/greenchild/project
-COPY include/zshrc /home/greenchild/.zshrc
-COPY include/helix /home/greenchild/.config/helix
-COPY include/tmux.conf /home/greenchild/.tmux.conf
-WORKDIR /home/greenchild/project
+RUN mkdir /home/dev/project
+COPY include/zshrc /home/dev/.zshrc
+COPY include/helix /home/dev/.config/helix
+COPY include/tmux.conf /home/dev/.tmux.conf
+WORKDIR /home/dev/project
 
 # Set correct permissions
-RUN chmod -R a+rw /home/greenchild/.config
+RUN chmod -R a+rw /home/dev/.config
 
-CMD su greenchild -c "SHELL='/usr/bin/zsh' tmux new-session -ds dev && tmux attach-session -t dev"
+CMD su dev -c "SHELL='/usr/bin/zsh' tmux new-session -ds dev && tmux attach-session -t dev"
