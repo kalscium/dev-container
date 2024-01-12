@@ -12,7 +12,7 @@ RUN echo 'dev ALL=(ALL) NOPASSWORD:ALL' >> /etc/sudoers
 
 # Get the required packages from apt
 RUN apt-get update -y
-RUN apt-get install -y zsh python3 python3-pip tmux software-properties-common curl
+RUN apt-get install -y zsh python3 python3-pip tmux software-properties-common curl git
 # Build dependencies
 RUN apt-get update -y
 RUN apt-get install -y mingw-w64 gcc libclang-dev llvm-dev gcc-arm-none-eabi
@@ -29,6 +29,10 @@ RUN su dev -c "curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchai
 RUN su dev -c "/home/dev/.cargo/bin/cargo install bacon"
 # Install pros-cli (for vexv5 dev)
 RUN su dev -c "pip install pros-cli"
+
+# Configure git (change this if you're not me)
+RUN su dev -c "git config --global user.email \"greenchild04@protonmail.com\""
+RUN su dev -c "git config --global user.name \"GreenChild04\""
 
 # Setup home dir
 RUN mkdir /home/dev/project
