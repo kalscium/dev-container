@@ -2,7 +2,7 @@ FROM ubuntu:latest
 
 # Rust toolchains
 ENV RUST_TOOLCHAIN="nightly-x86_64-unknown-linux-gnu"
-ENV RUST_TARGET_WIN="x86_64-pc-windows-gnu"
+ENV RUST_TARGETS="x86_64-pc-windows-gnu x86_64-unknown-linux-gnu x86_64-unknown-linux-musl"
 ENV SHELL="/usr/bin/zsh"
 
 # Create my user
@@ -12,10 +12,10 @@ RUN echo 'dev ALL=(ALL) NOPASSWORD:ALL' >> /etc/sudoers
 
 # Get the required packages from apt
 RUN apt-get update -y
-RUN apt-get install -y zsh python3 python3-pip tmux software-properties-common curl git
+RUN apt-get install -y zsh python3 python3-pip tmux software-properties-common curl git file
 # Build dependencies
 RUN apt-get update -y
-RUN apt-get install -y mingw-w64 gcc libclang-dev llvm-dev gcc-arm-none-eabi
+RUN apt-get install -y mingw-w64 gcc musl musl-tools libclang-dev llvm-dev gcc-arm-none-eabi
 
 # Install helix
 RUN add-apt-repository ppa:maveonair/helix-editor
@@ -23,10 +23,10 @@ RUN apt-get update -y
 RUN apt install helix
 
 # Install rust
-RUN su dev -c "curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain $RUST_TOOLCHAIN --target $RUST_TARGET_WIN --component rust-src rustfmt clippy cargo rustc rust-std rust-docs rust-analyzer"
+RUN su dev -c "curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain $RUST_TOOLCHAIN --target $RUST_TARGETS --component rust-src rustfmt clippy cargo rustc rust-std rust-docs rust-analyzer"
 
 # Install bacon
-RUN su dev -c "/home/dev/.cargo/bin/cargo install bacon"
+RUN su dev -c "/home/dev/.cargo/bin/cargo install --locked bacon"
 # Install pros-cli (for vexv5 dev)
 RUN su dev -c "pip install pros-cli"
 
