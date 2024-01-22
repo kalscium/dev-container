@@ -15,7 +15,7 @@ RUN apt-get update -y
 RUN apt-get install -y zsh python3 python3-pip tmux software-properties-common curl git file
 # Build dependencies
 RUN apt-get update -y
-RUN apt-get install -y mingw-w64 gcc musl musl-tools libclang-dev llvm-dev gcc-arm-none-eabi libnewlib-arm-none-eabi
+RUN apt-get install -y mingw-w64 gcc musl musl-tools libclang-dev llvm-dev clang libc6-dev gcc-arm-none-eabi
 
 # Install helix
 RUN add-apt-repository ppa:maveonair/helix-editor
