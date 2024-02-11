@@ -7,8 +7,6 @@ ENV SHELL="/usr/bin/zsh"
 
 # Create my user
 RUN useradd -m dev
-RUN usermod -aG sudo dev
-RUN echo 'dev ALL=(ALL) NOPASSWORD:ALL' >> /etc/sudoers
 
 # Get the required packages from apt
 RUN apt-get update -y
@@ -25,8 +23,8 @@ RUN apt install helix
 # Install rust
 RUN su dev -c "curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain $RUST_TOOLCHAIN --target $RUST_TARGETS --component rust-src rustfmt clippy cargo rustc rust-std rust-docs rust-analyzer"
 
-# Install bacon
-RUN su dev -c "/home/dev/.cargo/bin/cargo install --locked bacon"
+# Install bacon & taplo
+RUN su dev -c "/home/dev/.cargo/bin/cargo install --locked bacon taplo-cli"
 # Install pros-cli (for vexv5 dev)
 RUN su dev -c "pip install pros-cli"
 
