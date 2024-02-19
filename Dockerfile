@@ -14,7 +14,7 @@ RUN apt-get update -y
 RUN apt-get install -y zsh python3 python3-pip tmux software-properties-common curl git file
 # Build dependencies
 RUN apt-get update -y
-RUN apt-get install -y mingw-w64 gcc musl musl-tools libclang-dev llvm-dev clang libc6-dev gcc-arm-none-eabi pkg-config libssl-dev
+RUN apt-get install -y mingw-w64 gcc musl musl-tools libclang-dev llvm-dev clang libc6-dev gcc-arm-none-eabi pkg-config libssl-dev libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libxkbcommon-dev mesa-vulkan-drivers
 
 # Install helix
 RUN add-apt-repository ppa:maveonair/helix-editor
@@ -41,6 +41,6 @@ COPY include/tmux.conf /home/dev/.tmux.conf
 WORKDIR /home/dev/project
 
 # Set correct permissions
-RUN chmod -R a+rw /home/dev/.config
+RUN chmod -R a+rwX /home/dev/.config
 
 CMD su dev -c "SHELL='/usr/bin/zsh' tmux new-session -ds dev && tmux attach-session -t dev"
