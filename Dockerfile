@@ -4,6 +4,7 @@ FROM ubuntu:latest
 ENV RUST_TOOLCHAIN="nightly-x86_64-unknown-linux-gnu"
 ENV RUST_TARGETS="x86_64-pc-windows-gnu x86_64-unknown-linux-gnu x86_64-unknown-linux-musl"
 ENV SHELL="/usr/bin/zsh"
+ENV RUSTC_WRAPPER="sccache"
 
 # Create my user
 RUN useradd -m dev
@@ -13,7 +14,7 @@ RUN apt-get update -y
 RUN apt-get install -y zsh python3 python3-pip tmux software-properties-common curl git file
 # Build dependencies
 RUN apt-get update -y
-RUN apt-get install -y mingw-w64 gcc musl musl-tools libclang-dev llvm-dev clang libc6-dev gcc-arm-none-eabi
+RUN apt-get install -y mingw-w64 gcc musl musl-tools libclang-dev llvm-dev clang libc6-dev gcc-arm-none-eabi pkg-config libssl-dev
 
 # Install helix
 RUN add-apt-repository ppa:maveonair/helix-editor
@@ -23,8 +24,8 @@ RUN apt install helix
 # Install rust
 RUN su dev -c "curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain $RUST_TOOLCHAIN --target $RUST_TARGETS --component rust-src rustfmt clippy cargo rustc rust-std rust-docs rust-analyzer"
 
-# Install bacon & taplo
-RUN su dev -c "/home/dev/.cargo/bin/cargo install --locked bacon taplo-cli"
+# Install bacon, taplo, sccache and bat
+RUN su dev -c "export RUSTC_WRAPPER=\"\" && /home/dev/.cargo/bin/cargo install bacon taplo-cli sccache bat"
 # Install pros-cli (for vexv5 dev)
 RUN su dev -c "pip install pros-cli"
 
