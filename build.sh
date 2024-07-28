@@ -1,1 +1,1 @@
-docker build -t gc-dev .
+docker build -t dev .

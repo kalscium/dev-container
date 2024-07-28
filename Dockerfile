@@ -1,13 +1,10 @@
 FROM ubuntu:latest
 
 # Rust toolchains
-ENV RUST_TOOLCHAIN="nightly-x86_64-unknown-linux-gnu"
-ENV RUST_TARGETS="x86_64-pc-windows-gnu x86_64-unknown-linux-gnu x86_64-unknown-linux-musl"
+ENV RUST_TOOLCHAIN="rust-nightly"
+ENV RUST_COMPONENTS="clippy-preview,cargo,rustc,rust-docs,rust-analyzer-preview"
 ENV SHELL="/usr/bin/zsh"
 ENV RUSTC_WRAPPER="sccache"
-
-# Create my user
-RUN useradd -m dev
 
 # Get the required packages from apt
 RUN apt-get update -y
@@ -21,26 +18,35 @@ RUN add-apt-repository ppa:maveonair/helix-editor
 RUN apt-get update -y 
 RUN apt install helix
 
-# Install rust
-RUN su dev -c "curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain $RUST_TOOLCHAIN --target $RUST_TARGETS --component rust-src rustfmt clippy cargo rustc rust-std rust-docs rust-analyzer"
+WORKDIR /tmp
+
+# Install rust (linux)
+RUN curl https://static.rust-lang.org/dist/$RUST_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.xz -o $RUST_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.xz
+RUN tar -xf $RUST_TOOLCHAIN-x86_64-unknown-linux-gnu.tar.xz
+RUN $RUST_TOOLCHAIN-x86_64-unknown-linux-gnu/install.sh --components=$RUST_COMPONENTS,rust-std-x86_64-unknown-linux-gnu
+
+# Install rust (linux musl)
+RUN curl https://static.rust-lang.org/dist/$RUST_TOOLCHAIN-x86_64-unknown-linux-musl.tar.xz -o $RUST_TOOLCHAIN-x86_64-unknown-linux-musl.tar.xz
+RUN tar -xf $RUST_TOOLCHAIN-x86_64-unknown-linux-musl.tar.xz
+RUN $RUST_TOOLCHAIN-x86_64-unknown-linux-musl/install.sh --components=rust-std-x86_64-unknown-linux-musl
+
+# Install rust (mingw gnu)
+RUN curl https://static.rust-lang.org/dist/$RUST_TOOLCHAIN-x86_64-pc-windows-gnu.tar.xz -o $RUST_TOOLCHAIN-x86_64-pc-windows-gnu.tar.xz
+RUN tar -xf $RUST_TOOLCHAIN-x86_64-pc-windows-gnu.tar.xz
+RUN $RUST_TOOLCHAIN-x86_64-pc-windows-gnu/install.sh --components=rust-std-x86_64-pc-windows-gnu
 
 # Install bacon, taplo, sccache and bat
-RUN su dev -c "export RUSTC_WRAPPER=\"\" && /home/dev/.cargo/bin/cargo install bacon taplo-cli sccache bat"
+RUN RUSTC_WRAPPER="" cargo install bacon taplo-cli sccache bat just
 # Install pros-cli (for vexv5 dev)
-RUN su dev -c "pip install pros-cli"
+RUN pip install pros-cli --break-system-packages
 
-# Configure git (change this if you're not me)
-RUN su dev -c "git config --global user.email \"greenchild04@protonmail.com\""
-RUN su dev -c "git config --global user.name \"GreenChild04\""
+# Move the installed cargo/bin binaries and set perms
+RUN chmod -R a+rx /root/.cargo/bin
+RUN mv /root/.cargo/bin/* /usr/local/bin
 
-# Setup home dir
-RUN mkdir /home/dev/project
-COPY include/zshrc /home/dev/.zshrc
-COPY include/helix /home/dev/.config/helix
-COPY include/tmux.conf /home/dev/.tmux.conf
-WORKDIR /home/dev/project
+# Cleanup
+RUN rm -rf /tmp/rust*
+WORKDIR /
 
-# Set correct permissions
-RUN chmod -R a+rwX /home/dev/.config
-
-CMD su dev -c "SHELL='/usr/bin/zsh' tmux new-session -ds dev && tmux attach-session -t dev"
+# Startup command
+CMD zsh
