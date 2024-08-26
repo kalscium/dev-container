@@ -12,6 +12,7 @@ RUN apt-get install -y zsh python3 python3-pip tmux software-properties-common c
 # Build dependencies
 RUN apt-get update -y
 RUN apt-get install -y mingw-w64 gcc musl musl-tools libclang-dev llvm-dev clang libc6-dev gcc-arm-none-eabi pkg-config libssl-dev libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev libxkbcommon-dev mesa-vulkan-drivers
+RUN apt-get install -y qt5-qmake qtbase5-dev qtbase5-dev-tools libqt5svg5-dev libqt5webenginewidgets5 libqt5webchannel5-dev qtwebengine5-dev
 
 # Install helix
 RUN add-apt-repository ppa:maveonair/helix-editor
